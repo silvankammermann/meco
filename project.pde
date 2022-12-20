@@ -1,7 +1,7 @@
 PImage img_1;
 PImage img_2;
 PImage img_3;
-
+color colResult;
 
 
 /*This is an example of an "image convolution" using a kernel (small matrix)
@@ -62,6 +62,32 @@ PImage convertToDetectEdges(PImage image)
   return edgeImg;
 }
 
+void countBlackPixels(PImage grayImg)
+{
+  //variable to count black pixels in each column
+  int blackPixels = 0;
+  
+  // Loop through every pixel in the image
+  for (int x = 1; x < grayImg.width-1; x++) {   // Skip top and bottom edges
+  blackPixels = 0;
+    for (int y = 1; y < grayImg.height-1; y++) {  // Skip left and right edges
+    
+    // Determine pixel position / index
+      int idx = y*grayImg.width + x;
+      
+      // Greyscale
+      float red = red(grayImg.pixels[idx]); // get green channel value
+      float green = green(grayImg.pixels[idx]); // get green channel value
+      float blue = blue(grayImg.pixels[idx]); // get green channel value
+     
+      if(red==0 && green ==0 && blue==0){
+        blackPixels++;
+      }
+    }
+    println(blackPixels);
+  }
+}
+
 void draw()
 {
  
@@ -74,9 +100,18 @@ void draw()
   img_3=convertToDetectEdges(img_3);
   
   
+  img_1.updatePixels();
+  img_2.updatePixels();
+  img_3.updatePixels();
+  
+  countBlackPixels(img_1);
+  countBlackPixels(img_2);
+  countBlackPixels(img_3);
   
   // Display the images at positions (0,0)
   image(img_1, 0, 0); 
   image(img_2, 0, height/3);
   image(img_3, 0, height*2/3);
+  
+
 }
