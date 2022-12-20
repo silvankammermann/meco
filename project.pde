@@ -2,7 +2,7 @@ PImage img_1;
 PImage img_2;
 PImage img_3;
 color colResult;
-
+ boolean i=true;
 
 /*This is an example of an "image convolution" using a kernel (small matrix)
  * to analyze and transform a pixel based on the values of its neighbors.
@@ -38,10 +38,9 @@ PImage convertToDetectEdges(PImage image)
   // Loop through every pixel in the image
   for (int y = 1; y < grayImg.height-1; y++) {   // Skip top and bottom edges
     for (int x = 1; x < grayImg.width-1; x++) {  // Skip left and right edges
-      // Output of this filter is shown as offset from 50% gray.
-      // This preserves transitions from low (dark) to high (light) value.
-      // Starting from zero will show only high edges on black instead.
-      float sum = 128;
+  
+      // Starting from zero will show only high edges on black.
+      float sum = 0;
       for (int ky = -1; ky <= 1; ky++) {
         for (int kx = -1; kx <= 1; kx++) {
           // Calculate the adjacent pixel for this kernel point
@@ -84,34 +83,48 @@ void countBlackPixels(PImage grayImg)
         blackPixels++;
       }
     }
-    println(blackPixels);
+    
+    for (int y = grayImg.height-1; y > 0; y--) { 
+      // Determine pixel position / index
+      int idx = y*grayImg.width + x;
+       if(blackPixels>0){
+         grayImg.pixels[idx] = color(0,0,0);
+         blackPixels--;
+       }else{
+         grayImg.pixels[idx] = color(255,255,255);
+       }
+    }
   }
 }
 
+
 void draw()
 {
- 
-  img_1.resize(width, height/3);
-  img_2.resize(width, height/3);
-  img_3.resize(width, height/3);
-  
-  img_1=convertToDetectEdges(img_1);
-  img_2=convertToDetectEdges(img_2);
-  img_3=convertToDetectEdges(img_3);
-  
-  
-  img_1.updatePixels();
-  img_2.updatePixels();
-  img_3.updatePixels();
-  
-  countBlackPixels(img_1);
-  countBlackPixels(img_2);
-  countBlackPixels(img_3);
-  
-  // Display the images at positions (0,0)
-  image(img_1, 0, 0); 
-  image(img_2, 0, height/3);
-  image(img_3, 0, height*2/3);
+  if(i){
+    i=false;
+    img_1.resize(width, height/3);
+    img_2.resize(width, height/3);
+    img_3.resize(width, height/3);
+    
+    img_1=convertToDetectEdges(img_1);
+    img_2=convertToDetectEdges(img_2);
+    img_3=convertToDetectEdges(img_3);
+    
+    
+    countBlackPixels(img_1);
+    countBlackPixels(img_2);
+    countBlackPixels(img_3);
+    
+    
+    img_1.updatePixels();
+    img_2.updatePixels();
+    img_3.updatePixels();
+    
+    // Display the images at positions (0,0)
+    image(img_1, 0, 0); 
+    image(img_2, 0, height/3);
+    image(img_3, 0, height*2/3);
+  }
   
 
 }
