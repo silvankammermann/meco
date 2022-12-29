@@ -1,10 +1,6 @@
-PImage img_1;
-PImage img_2;
-PImage img_3;
-color colResult;
- boolean i=true;
+ArrayList<PImage> images = new ArrayList<PImage>();
 
-/*This is an example of an "image convolution" using a kernel (small matrix)
+/* This is an example of an "image convolution" using a kernel (small matrix)
  * to analyze and transform a pixel based on the values of its neighbors.
  *
  * This kernel describes a "Laplacian Edge Detector".
@@ -19,11 +15,10 @@ void settings()
 }
 
 void setup()
-{
-  img_1 = loadImage("02_landscape.jpg");
-  img_2=loadImage("flower02.png");
-  img_3=loadImage("splash.jpg");
-  
+{ 
+  images.add(loadImage("02_landscape.jpg"));
+  images.add(loadImage("flower02.png"));
+  images.add(loadImage("splash.jpg"));
 } 
 
 PImage convertToDetectEdges(PImage image)
@@ -79,7 +74,7 @@ void countBlackPixels(PImage grayImg)
       float green = green(grayImg.pixels[idx]); // get green channel value
       float blue = blue(grayImg.pixels[idx]); // get green channel value
      
-      if(red==0 && green ==0 && blue==0){
+      if(red==0 && green==0 && blue==0){
         blackPixels++;
       }
     }
@@ -87,12 +82,12 @@ void countBlackPixels(PImage grayImg)
     for (int y = grayImg.height-1; y > 0; y--) { 
       // Determine pixel position / index
       int idx = y*grayImg.width + x;
-       if(blackPixels>0){
-         grayImg.pixels[idx] = color(0,0,0);
-         blackPixels--;
-       }else{
+      if (blackPixels>0) {
+        grayImg.pixels[idx] = color(0,0,0);
+        blackPixels--;
+      } else {
          grayImg.pixels[idx] = color(255,255,255);
-       }
+      }
     }
   }
 }
@@ -100,31 +95,12 @@ void countBlackPixels(PImage grayImg)
 
 void draw()
 {
-  if(i){
-    i=false;
-    img_1.resize(width, height/3);
-    img_2.resize(width, height/3);
-    img_3.resize(width, height/3);
-    
-    img_1=convertToDetectEdges(img_1);
-    img_2=convertToDetectEdges(img_2);
-    img_3=convertToDetectEdges(img_3);
-    
-    
-    countBlackPixels(img_1);
-    countBlackPixels(img_2);
-    countBlackPixels(img_3);
-    
-    
-    img_1.updatePixels();
-    img_2.updatePixels();
-    img_3.updatePixels();
-    
-    // Display the images at positions (0,0)
-    image(img_1, 0, 0); 
-    image(img_2, 0, height/3);
-    image(img_3, 0, height*2/3);
+  for (int i = 0; i < images.size(); i++) {
+    PImage img = images.get(i);
+    img.resize(width, height / images.size());
+    img = convertToDetectEdges(img);
+    countBlackPixels(img);
+    img.updatePixels();
+    image(img, 0, i * height / images.size());
   }
-  
-
 }
