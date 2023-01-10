@@ -47,10 +47,11 @@ void draw()
     imgNote.resize(50,50);
     image(imgNote, 0, i * height / images.size());
     
-
     for (Integer x : noteCoords.keySet()) {
-      if (noteCoords.get((int) (i * width + t)) != null) {
-        moveNote(imgNote, t, noteCoords.get((int) (i * width + t)));
+      for (int j = 0; j < images.size(); j++) {
+        if (noteCoords.get(j * width + t)) {
+          moveNote(imgNote, t, noteCoords.get(x));
+        }
       }
     }
   }
@@ -67,6 +68,7 @@ void moveNote(PImage note, float x, float y)
     translate(width - note.width, y);
     image(note, 0, 0); 
   }
+  
   pop();
 }
 
