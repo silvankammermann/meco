@@ -1,5 +1,6 @@
 ArrayList<PImage> images = new ArrayList<PImage>();
-HashMap<Float, Float> noteCoords = new HashMap<Float, Float>();
+ArrayList<PImage> imagesNote = new ArrayList<PImage>();
+HashMap<Integer, Float> noteCoords = new HashMap<Integer, Float>();
 PImage note;
 float t;
 
@@ -23,6 +24,10 @@ void setup()
   images.add(loadImage("02_landscape.jpg"));
   images.add(loadImage("flower02.png"));
   images.add(loadImage("splash.jpg"));
+  
+  for(int i=0; i<images.size();i++){
+    imagesNote.add(loadImage("musiknote.png"));
+  }
 } 
 
 void draw()
@@ -32,27 +37,35 @@ void draw()
   note.resize(50, 50);
   for (int i = 0; i < images.size(); i++) {
     PImage img = images.get(i);
+    PImage imgNote=imagesNote.get(i);
     img.resize(width, height / images.size());
     img = convertToDetectEdges(img);
     convertToBlackAndWhite(img, i);
     img.updatePixels();
     image(img, 0, i * height / images.size());
+    
+    imgNote.resize(50,50);
+    image(imgNote, 0, i * height / images.size());
+    
+    for (Integer x : noteCoords.keySet()) {
+      moveNote(imgNote,((int)x % (int)width), noteCoords.get(x));
+    }
   }
-
-  for (Float x : noteCoords.keySet()) {
-    image(note, x, noteCoords.get(x));
-  }
-  
 }
 
 void moveNote(PImage note, float x, float y) 
 {
+  push();
   if (note.width + x < width) {
-    image(note, x, y);
+    translate(x,y);
+    image(note, 0, 0);
   }
   else {
-    image(note, width - note.width, y); 
+    translate(width - note.width, y);
+    image(note, 0, 0); 
   }
+  
+  pop();
 }
 
 
@@ -117,20 +130,17 @@ void convertToBlackAndWhite(PImage img, int imgCount)
         whitePixels++;
         img.pixels[idx] = color(255,255,255);
       }
-    }
     
-    if (whitePixels > 20) {
-      float yPos = 0;
-      // if (imgCount == 0) {
-      //   yPos = height - note.height - whitePixels;
-      // } else {
-      //   yPos = height - note.height - whitePixels - (height / images.size()) * (images.size() - imgCount);
-      // }
-
-        yPos = height / images.size() * (imgCount + 1) - whitePixels - note.height;
-        noteCoords.put((float) x, (float) yPos);
+    
+   
       
+    if(whitePixels > 20){
+      float yPos = 0;
+      yPos = height / images.size() * (imgCount + 1) - whitePixels - note.height;
+      noteCoords.put((int)width*imgCount+(Integer)x, (float) yPos);
     }
+  }
+      
 
 
     
