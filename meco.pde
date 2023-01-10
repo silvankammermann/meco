@@ -1,4 +1,7 @@
 ArrayList<PImage> images = new ArrayList<PImage>();
+HashMap<Float, Float> noteCoords = new HashMap<Float, Float>();
+PImage note;
+float t;
 
 /* This is an example of an "image convolution" using a kernel (small matrix)
  * to analyze and transform a pixel based on the values of its neighbors.
@@ -16,10 +19,42 @@ void settings()
 
 void setup()
 { 
+  note = loadImage("musiknote.png");
   images.add(loadImage("02_landscape.jpg"));
   images.add(loadImage("flower02.png"));
   images.add(loadImage("splash.jpg"));
 } 
+
+void draw()
+{
+  
+  t = millis() * 0.25f;
+  note.resize(50, 50);
+  for (int i = 0; i < images.size(); i++) {
+    PImage img = images.get(i);
+    img.resize(width, height / images.size());
+    img = convertToDetectEdges(img);
+    convertToBlackAndWhite(img, i);
+    img.updatePixels();
+    image(img, 0, i * height / images.size());
+  }
+
+  for (Float x : noteCoords.keySet()) {
+    image(note, x, noteCoords.get(x));
+  }
+  
+}
+
+void moveNote(PImage note, float x, float y) 
+{
+  if (note.width + x < width) {
+    image(note, x, y);
+  }
+  else {
+    image(note, width - note.width, y); 
+  }
+}
+
 
 PImage convertToDetectEdges(PImage image)
 {
@@ -56,7 +91,7 @@ PImage convertToDetectEdges(PImage image)
   return edgeImg;
 }
 
-void convertToBlackAndWhite(PImage img)
+void convertToBlackAndWhite(PImage img, int imgCount)
 {
   //variable to count black pixels in each column
   int whitePixels = 0;
@@ -84,6 +119,21 @@ void convertToBlackAndWhite(PImage img)
       }
     }
     
+    if (whitePixels > 20) {
+      float yPos = 0;
+      // if (imgCount == 0) {
+      //   yPos = height - note.height - whitePixels;
+      // } else {
+      //   yPos = height - note.height - whitePixels - (height / images.size()) * (images.size() - imgCount);
+      // }
+
+        yPos = height / images.size() * (imgCount + 1) - whitePixels - note.height;
+        noteCoords.put((float) x, (float) yPos);
+      
+    }
+
+
+    
     for (int y = img.height-1; y > 0; y--) { 
       // Determine pixel position / index
       int idx = y*img.width + x;
@@ -94,19 +144,5 @@ void convertToBlackAndWhite(PImage img)
          img.pixels[idx] = color(255,255,255);
       }
     }
-  }
-}
-
-
-
-void draw()
-{
-  for (int i = 0; i < images.size(); i++) {
-    PImage img = images.get(i);
-    img.resize(width, height / images.size());
-    img = convertToDetectEdges(img);
-    convertToBlackAndWhite(img);
-    img.updatePixels();
-    image(img, 0, i * height / images.size());
   }
 }
