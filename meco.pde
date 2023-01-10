@@ -56,41 +56,47 @@ PImage convertToDetectEdges(PImage image)
   return edgeImg;
 }
 
-void countBlackPixels(PImage grayImg)
+void convertToBlackAndWhite(PImage img)
 {
   //variable to count black pixels in each column
-  int blackPixels = 0;
+  int whitePixels = 0;
   
   // Loop through every pixel in the image
-  for (int x = 1; x < grayImg.width-1; x++) {   // Skip top and bottom edges
-  blackPixels = 0;
-    for (int y = 1; y < grayImg.height-1; y++) {  // Skip left and right edges
+  for (int x = 1; x < img.width-1; x++) {   // Skip top and bottom edges
+  whitePixels = 0;
+    for (int y = 1; y < img.height-1; y++) {  // Skip left and right edges
     
     // Determine pixel position / index
-      int idx = y*grayImg.width + x;
+      int idx = y*img.width + x;
       
       // Greyscale
-      float red = red(grayImg.pixels[idx]); // get green channel value
-      float green = green(grayImg.pixels[idx]); // get green channel value
-      float blue = blue(grayImg.pixels[idx]); // get green channel value
+      float red = red(img.pixels[idx]); // get green channel value
+      float green = green(img.pixels[idx]); // get green channel value
+      float blue = blue(img.pixels[idx]); // get green channel value
      
-      if(red==0 && green==0 && blue==0){
-        blackPixels++;
+     // If the pixel is black, set it to black
+      if (red + green + blue <= 40 * 3) { // 40 * ≈ 128
+        img.pixels[idx] = color(0,0,0);
+      }
+      else {
+        whitePixels++;
+        img.pixels[idx] = color(255,255,255);
       }
     }
     
-    for (int y = grayImg.height-1; y > 0; y--) { 
+    for (int y = img.height-1; y > 0; y--) { 
       // Determine pixel position / index
-      int idx = y*grayImg.width + x;
-      if (blackPixels>0) {
-        grayImg.pixels[idx] = color(0,0,0);
-        blackPixels--;
+      int idx = y*img.width + x;
+      if (whitePixels>0) {
+        img.pixels[idx] = color(0,0,0);
+        whitePixels--;
       } else {
-         grayImg.pixels[idx] = color(255,255,255);
+         img.pixels[idx] = color(255,255,255);
       }
     }
   }
 }
+
 
 
 void draw()
@@ -99,7 +105,7 @@ void draw()
     PImage img = images.get(i);
     img.resize(width, height / images.size());
     img = convertToDetectEdges(img);
-    countBlackPixels(img);
+    convertToBlackAndWhite(img);
     img.updatePixels();
     image(img, 0, i * height / images.size());
   }
