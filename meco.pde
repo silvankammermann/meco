@@ -1,3 +1,6 @@
+import processing.sound.*;
+SoundFile soundFile;
+
 ArrayList<PImage> images = new ArrayList<PImage>();
 ArrayList<PImage> imagesNote = new ArrayList<PImage>();
 HashMap<Integer, Float> noteCoords = new HashMap<Integer, Float>();
@@ -30,6 +33,7 @@ void setup()
     imagesNote.add(loadImage("musiknote.png"));
   }
   
+  soundFile = new SoundFile(this, "BD.wav");
   // selectInput("Select a file to process:", "fileSelected");
 }
 
@@ -49,8 +53,15 @@ void draw()
     imgNote.resize(50,50);    
 
     for (Integer x : noteCoords.keySet()) {
+      int imgCount = x / width;
       if (noteCoords.get((int) (i * width + t)) != null) {
         moveNote(imgNote, t, noteCoords.get((int) (i * width + t)));
+
+        if (imgCount == 0) {
+          // soundFile.play();
+        }
+      } else {
+        soundFile.pause();
       }
     }
   }
