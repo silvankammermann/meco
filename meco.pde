@@ -23,60 +23,67 @@ void settings()
 }
 
 void setup()
-{ 
-  note = loadImage("musiknote.png");
+{
+  
+  
   images.add(loadImage("02_landscape.jpg"));
   images.add(loadImage("flower02.png"));
   images.add(loadImage("splash.jpg"));
   
-  for(int i=0; i<images.size();i++){
-    imagesNote.add(loadImage("musiknote.png"));
+  note = loadImage("musiknote.png");
+  note.resize(50, 50);
+  for(int i=0; i<images.size(); i++){
+    imagesNote.add(note);
   }
   
   soundFile = new SoundFile(this, "BD.wav");
   // selectInput("Select a file to process:", "fileSelected");
-}
-
-void draw()
-{
-  t = millis() * 0.25f;
-  note.resize(50, 50);
   for (int i = 0; i < images.size(); i++) {
     PImage img = images.get(i);
-    PImage imgNote=imagesNote.get(i);
     img.resize(width, height / images.size());
     img = convertToDetectEdges(img);
     convertToBlackAndWhite(img, i);
     img.updatePixels();
     image(img, 0, i * height / images.size());
-    
-    imgNote.resize(50,50);    
-
-    for (Integer x : noteCoords.keySet()) {
-      int imgCount = x / width;
-      if (noteCoords.get((int) (i * width + t)) != null) {
-        moveNote(imgNote, t, noteCoords.get((int) (i * width + t)));
-
-        if (imgCount == 0) {
-          // soundFile.play();
-        }
-      } else {
-        soundFile.pause();
-      }
-    }
   }
+
+}
+
+void draw()
+{
+  t = millis() * 0.1f;
+ 
+  /*
+  for (Integer x : noteCoords.keySet()) {
+    int imgCount = x / width;
+    // if (noteCoords.get((int) (i * width + t)) != null) {
+    //   moveNote(imgNote, t, noteCoords.get((int) (i * width + t)));
+    // } else {
+    //   moveNote(imgNote, t, height / images.size() * (imgCount + 1) - note.height);
+    // }
+  }/**/  
+  
+  background(0);
+  
+  for (int i = 0; i < images.size(); i++) {
+    push();
+    translate(t, height / images.size() * (i + 1) - note.height);
+    image(note, 0, 0);
+    pop();
+  }
+ 
 }
 
 void moveNote(PImage note, float x, float y) 
 {
   push();
   if (note.width + x < width) {
-    translate(x,y);
-    image(note, 0, 0);
+    translate(x, y);
   }
   else {
-    translate(width - note.width, y);
-    image(note, 0, 0); 
+    translate(width - note.width, y); 
   }
+  
+  image(note, 0, 0);
   pop();
 }
